@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Dorine's Ayurveda consultation</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a5568">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; 
+            background-color: #f7fafc; /* Tailwind gray-100 */
+        }
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab.active {
+            border-bottom-color: #4a5568; /* Tailwind gray-700 */
+            color: #2d3748; /* Tailwind gray-800 */
+            font-weight: 600;
+        }
+        .tab:hover:not(.tab-disabled) { 
+            background-color: #edf2f7; /* Tailwind gray-200 */
+        }
+        .tab-disabled {
+            opacity: 0.5;
+            pointer-events: none; 
+            cursor: not-allowed;
+        }
+        .section {
+            display: none;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-top: 1rem;
+        }
+        .section.active {
+            display: block;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0; /* Tailwind gray-300 */
+            border-radius: 0.375rem; /* Tailwind rounded-md */
+            margin-top: 0.25rem;
+            box-shadow: inset 0 1px 2px 0 rgba(0,0,0,0.05);
+        }
+        .input-field:disabled {
+            background-color: #f7fafc; /* gray-100 */
+            cursor: not-allowed;
+            color: #718096; /* gray-500 */
+        }
+        .label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4a5568; /* Tailwind gray-700 */
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            color: white;
+            background-color: #4a5568; /* Tailwind gray-700 */
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+        .btn:hover:not(:disabled) {
+            background-color: #2d3748; /* Tailwind gray-800 */
+        }
+        .btn:disabled {
+            background-color: #a0aec0; /* gray-400 */
+            cursor: not-allowed;
+        }
+        .btn-danger {
+            background-color: #e53e3e; /* red-600 */
+        }
+        .btn-danger:hover:not(:disabled) {
+            background-color: #c53030; /* red-700 */
+        }
+        .result-card {
+            background-color: #f9fafb; /* Tailwind gray-50 */
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0; /* Tailwind gray-300 */
+        }
+        .result-card h3 {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600;
+            color: #2d3748; /* gray-800 */
+            margin-bottom: 0.5rem;
+        }
+         .result-card h4 {
+            font-size: 1rem; /* text-base */
+            font-weight: 600;
+            color: #2c5282; /* blue-800 */
+            margin-top: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+        .result-card p, .result-card ul {
+            font-size: 0.875rem; /* text-sm */
+            color: #4a5568; /* gray-700 */
+            line-height: 1.6;
+        }
+        .result-card ul {
+            list-style-type: disc;
+            padding-left: 1.5rem; /* Tailwind pl-6 */
+            margin-top: 0.25rem;
+        }
+        .question-category {
+            margin-bottom: 1.5rem;
+            padding: 1rem; /* Added padding for better visual of border */
+            border: 1px dashed #cbd5e0; /* Tailwind gray-400 */
+            border-radius: 0.25rem; /* Slightly rounded corners for the box */
+        }
+        .question-category:last-of-type { 
+             /* border-bottom: none; */
+        }
+        .question-category p.label { 
+            font-size: 1rem; /* text-base */
+            font-weight: 600;
+            color: #2c5282; /* Tailwind blue-800 */
+            margin-bottom: 0.75rem;
+        }
+        .radio-label { 
+            margin-left: 0.5rem; 
+            display: block; 
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .radio-input {
+             margin-right: 0.5rem; 
+        }
+        .radio-input:disabled + span {
+            color: #a0aec0; /* gray-400 */
+        }
+        .unanswered-question {
+            border: 2px solid #e53e3e !important; /* Red border for unanswered */
+            background-color: #fff5f5; /* Light red background */
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8"> 
+    <div id="pinModal" class="modal-overlay modal-hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Enter PIN</h2>
+            <input type="password" id="pinInput" class="input-field mb-4" placeholder="PIN">
+            <button class="btn w-full mb-2" onclick="verifyPin()">Submit</button>
+            <p id="pinError" class="text-sm text-red-500"></p>
+        </div>
+    </div>
+
+    <div id="masterPasswordModal" class="modal-overlay modal-hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Enter Master Password to Reset</h2>
+            <input type="password" id="masterPasswordInput" class="input-field mb-4" placeholder="Master Password">
+            <button class="btn w-full mb-2" onclick="verifyMasterPasswordAndReset()">Reset App</button>
+            <button class="btn btn-danger w-full" onclick="closeMasterPasswordModal()">Cancel</button>
+            <p id="masterPasswordError" class="text-sm text-red-500 mt-2"></p>
+        </div>
+    </div>
+    
+    <div id="appContent" class="opacity-25 pointer-events-none"> 
+        <header class="bg-white shadow-md rounded-lg p-4 mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800">Welcome to Dorine's Ayurveda consultation</h1>
+            <div class="flex justify-between items-center mt-2">
+                <span id="sessionStatus" class="text-xs text-gray-500">Awaiting PIN.</span>
+                <button id="resetAppButton" class="btn btn-danger text-xs py-1 px-2" onclick="promptForMasterPassword()">Reset for New Session</button>
+            </div>
+            <nav class="mt-4 flex flex-wrap justify-center border-b border-gray-300">
+                <div class="tab active" onclick="showSection('profileInput')">Profile Input</div>
+                <div class="tab tab-disabled" onclick="showSection('numerology')">Numerology & Element</div>
+                <div class="tab tab-disabled" onclick="showSection('ayurvedaQuiz')">Ayurveda (Dosha) Quiz</div>
+                <div class="tab tab-disabled" onclick="showSection('ayurvedaGuidance')">Ayurvedic Guidance</div>
+            </nav>
+        </header>
+
+        <main>
+            <section id="profileInput" class="section active">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Enter Your Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="fullName" class="label">Full Birth Name (as on birth certificate):</label>
+                        <input type="text" id="fullName" class="input-field" placeholder="Example: Jane Elizabeth Doe">
+                    </div>
+                    <div>
+                        <label for="dob" class="label">Date of Birth:</label>
+                        <input type="date" id="dob" class="input-field">
+                    </div>
+                    <button id="saveProfileButton" class="btn" onclick="saveProfileAndCalculate()">Save & Calculate</button>
+                </div>
+                <p id="profileMessage" class="mt-4 text-sm text-green-600"></p>
+            </section>
+
+            <section id="numerology" class="section">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Your Numerology & Elemental Profile</h2>
+                <div id="numerologyResults" class="space-y-4">
+                    <p class="text-gray-600">Please enter and save your information in the "Profile Input" section first.</p>
+                </div>
+            </section>
+
+            <section id="ayurvedaQuiz" class="section">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Ayurvedic Constitution (Dosha) Assessment</h2>
+                <p class="text-sm text-gray-600 mb-6">For each category below, select the option that best describes you most of your life, not just your current state.</p>
+                <form id="doshaQuizForm" class="space-y-2">
+                    
+                    <div class="question-category">
+                        <p class="label">1. Body Type:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q1" value="vata" class="radio-input"> Thin and unusually tall or short</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q1" value="pitta" class="radio-input"> Medium body</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q1" value="kapha" class="radio-input"> Large body</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">2. Bone Structure:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q2" value="vata" class="radio-input"> Light/small bones and/or prominent joints</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q2" value="pitta" class="radio-input"> Medium bone structure</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q2" value="kapha" class="radio-input"> Heavy large stocky bone structure</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">3. Fingers/Toes:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q3" value="vata" class="radio-input"> Long tapering fingers/toes</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q3" value="pitta" class="radio-input"> Medium fingers/toes</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q3" value="kapha" class="radio-input"> Large fingers/toes</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">4. Weight in Childhood:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q4" value="vata" class="radio-input"> Thin as a child</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q4" value="pitta" class="radio-input"> Medium weight as a child</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q4" value="kapha" class="radio-input"> Weight heavier throughout childhood and on</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">5. Adult Weight Gain Pattern:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q5" value="vata" class="radio-input"> If weight gain, it’s around the middle (assuming Vata for irregular distribution)</label> 
+                        <label class="radio-label"><input type="radio" name="ayur_q5" value="pitta" class="radio-input"> If weight gain, it’s evenly distributed</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q5" value="kapha" class="radio-input"> Weight gains mainly in rear/thighs</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">6. Skin Complexion & Sun Reaction:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q6" value="vata" class="radio-input"> Dark complexion compared to family – tans easily</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q6" value="pitta" class="radio-input"> Fair skin. Sun burns easily; freckles</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q6" value="kapha" class="radio-input"> Tans evenly, beautiful skin color from sun</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">7. Body Hair:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q7" value="vata" class="radio-input"> Body hair is scanty or overly abundant – tends to be coarse, curly</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q7" value="pitta" class="radio-input"> Light body hair, finely textured; early (graying/loss)</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q7" value="kapha" class="radio-input"> Moderate amount of body hair</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">8. Forehead:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q8" value="vata" class="radio-input"> Small forehead</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q8" value="pitta" class="radio-input"> Medium forehead with folds and lines</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q8" value="kapha" class="radio-input"> Large forehead usually few lines</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">9. Eyes:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q9" value="vata" class="radio-input"> Small active eyes often darker color</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q9" value="pitta" class="radio-input"> Medium light-green, grey, amber, or blue eyes; Intense eyes</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q9" value="kapha" class="radio-input"> Large, liquid eyes easy to look at</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">10. Teeth:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q10" value="vata" class="radio-input"> Crooked, uneven, buck teeth; braces when younger</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q10" value="pitta" class="radio-input"> Med., even teeth, gums bleed easily</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q10" value="kapha" class="radio-input"> Large, even, gleaming teeth</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">11. Chin:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q11" value="vata" class="radio-input"> Delicate chin</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q11" value="pitta" class="radio-input"> Moderate chin</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q11" value="kapha" class="radio-input"> Large chin and jaw</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">12. Hair as a Child:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q12" value="vata" class="radio-input"> As a child, hair kinky/curly</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q12" value="pitta" class="radio-input"> As a child, hair fine/light hair often blond</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q12" value="kapha" class="radio-input"> As a child, hair wavy/thick</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">13. Pulse & Hand Temperature:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q13" value="vata" class="radio-input"> Thin, fast, variable pulse; cold hands</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q13" value="pitta" class="radio-input"> Strong, full pulse; warm hands</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q13" value="kapha" class="radio-input"> Steady, slow, rhythmic pulse; medium temp hands</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">14. Nails:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q14" value="vata" class="radio-input"> Brittle nails</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q14" value="pitta" class="radio-input"> Flexible nails, but strong</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q14" value="kapha" class="radio-input"> Strong thick nails not flexible</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">15. Thirst:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q15" value="vata" class="radio-input"> Thirst – changeable</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q15" value="pitta" class="radio-input"> Thirst – excessive</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q15" value="kapha" class="radio-input"> Thirst – sparse</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">16. Memory:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q16" value="vata" class="radio-input"> Good short-term memory, but forgets easily</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q16" value="pitta" class="radio-input"> Quick memory, accurate past and future</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q16" value="kapha" class="radio-input"> Slow memory recall but accurate past and future</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">17. Preference for Routine:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q17" value="vata" class="radio-input"> Dislikes routine</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q17" value="pitta" class="radio-input"> Enjoys planning/organizing, especially if self-created</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q17" value="kapha" class="radio-input"> Works well with routine</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">18. Decision Making:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q18" value="vata" class="radio-input"> Decisions difficult, changes mind easily</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q18" value="pitta" class="radio-input"> Quick decisions</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q18" value="kapha" class="radio-input"> Slow to make decisions but unchangeable after made</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">19. Physical Activity:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q19" value="vata" class="radio-input"> Likes to stay physically active</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q19" value="pitta" class="radio-input"> Exercises to reduce stress</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q19" value="kapha" class="radio-input"> Likes leisurely activities, games, cards, movies</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">20. Work Style/Creativity:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q20" value="vata" class="radio-input"> Creative, spontaneous artist</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q20" value="pitta" class="radio-input"> Organized thinker/leader. Constantly organizing, likes order</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q20" value="kapha" class="radio-input"> Prefers to work under routine and to support ideals and goals of work environment or organization</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">21. Project Management:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q21" value="vata" class="radio-input"> Does many projects all at once, prefers multitasking, often tasks undone</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q21" value="pitta" class="radio-input"> Prefers organization and order in projects</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q21" value="kapha" class="radio-input"> Projects few but tasks are completed.</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">22. Social Relationships:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q22" value="vata" class="radio-input"> Knows a lot of people, few close friends</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q22" value="pitta" class="radio-input"> Very selective with friends. Makes enemies easily</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q22" value="kapha" class="radio-input"> Very loyal and has many friends.</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">23. Spending Money:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q23" value="vata" class="radio-input"> Spends money impulsively</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q23" value="pitta" class="radio-input"> Plans spending money on special purchases</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q23" value="kapha" class="radio-input"> Spends money reluctantly, likes to save</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">24. Body Temperature & Perspiration:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q24" value="vata" class="radio-input"> Cold hands/feet. Perspires little</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q24" value="pitta" class="radio-input"> Usually warmer than others. Perspires easily</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q24" value="kapha" class="radio-input"> Moderate circulation and perspiration</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">25. Sleep:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q25" value="vata" class="radio-input"> Light sleeper, wakes frequently</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q25" value="pitta" class="radio-input"> Usually sleeps well</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q25" value="kapha" class="radio-input"> Sound, heavy sleeper (8+ hours)</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">26. Climate Preferences:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q26" value="vata" class="radio-input"> Prefers warm climate, sunshine, moisture. Dislikes dry, cold</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q26" value="pitta" class="radio-input"> Prefers cool, well-ventilated places</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q26" value="kapha" class="radio-input"> Tolerates most climates as long as not too humid</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">27. Lips:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q27" value="vata" class="radio-input"> Often suffers from cracked, chapped lips</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q27" value="pitta" class="radio-input"> Lips have tendency towards cold sores, fever blisters</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q27" value="kapha" class="radio-input"> Full, moist lips</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">28. Weight Management:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q28" value="vata" class="radio-input"> Difficulty gaining weight</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q28" value="pitta" class="radio-input"> Can gain or lose weight if focused</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q28" value="kapha" class="radio-input"> Gains weight easily, but hard time losing it without exercising</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">29. Skin (General Condition):</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q29" value="vata" class="radio-input"> Dry skin, chaps easily, prone to calluses</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q29" value="pitta" class="radio-input"> Oily skin, prone to pimples and rashes</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q29" value="kapha" class="radio-input"> Thicker skin usually beautiful with no need for lubrication</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">30. Eyes (General Condition):</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q30" value="vata" class="radio-input"> Eyes often dry and itchy</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q30" value="pitta" class="radio-input"> Eyes sensitive can get red from over work or environment</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q30" value="kapha" class="radio-input"> Tendency to puffy eyes</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">31. Tongue:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q31" value="vata" class="radio-input"> Short, dry tongue with thin grayish coating</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q31" value="pitta" class="radio-input"> Pointed tongue, yellow/reddish coating</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q31" value="kapha" class="radio-input"> Tongue large with thick white coating</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">32. Bowel Movements:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q32" value="vata" class="radio-input"> Bowel movements irregular, hard, dry; constipation. If nervous disorders, sharp pain</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q32" value="pitta" class="radio-input"> Tendency to have Loose stools (2 x daily)</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q32" value="kapha" class="radio-input"> Large full bowel movements (1 x daily) takes longer to have</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">33. Menstruation (for women; men select an option or ignore):</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q33" value="vata" class="radio-input"> Menses irregular, scanty flow, severe, painful cramps</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q33" value="pitta" class="radio-input"> Heavy flow, but of shorter duration often loose stools accompany menses</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q33" value="kapha" class="radio-input"> Prone to water-weight retention during menses, slight cramps moderate flow</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">34. Gums:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q34" value="vata" class="radio-input"> Prone to Receding gums</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q34" value="pitta" class="radio-input"> Prone to Inflamed, bleeding gums</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q34" value="kapha" class="radio-input"> Thick healthy gums</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">35. Joints:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q35" value="vata" class="radio-input"> Prone to Joints cracking stiffness</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q35" value="pitta" class="radio-input"> Prone to Joints becoming inflamed</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q35" value="kapha" class="radio-input"> Prone to loose, joints that swell and have congestion</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">36. Appetite & Food Preferences:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q36_appetite" value="vata" class="radio-input"> Variable appetite, likes to skip meals, feels lighter</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q36_appetite" value="pitta" class="radio-input"> Appetite very good, irritable if meal is missed, difficult physical time</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q36_appetite" value="kapha" class="radio-input"> Consistent appetite, little slow, can skip meals without physical problems</label>
+                    </div>
+                    <div class="question-category">
+                         <p class="label"></p>
+                        <label class="radio-label"><input type="radio" name="ayur_q36_preference" value="vata" class="radio-input"> Likes to snack and nibble, crunchy dry foods preferred</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q36_preference" value="pitta" class="radio-input"> Likes spicy flavor, proteins and caffeine</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q36_preference" value="kapha" class="radio-input"> Likes sweets, dairy, breads, pastry</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">37. Stress Reaction:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q37" value="vata" class="radio-input"> Under stress tends toward fear, anxiety. Tends towards self destructive behavior</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q37" value="pitta" class="radio-input"> Under stress tends towards irritability, anger, frustration; tends to point fingers at others. Can be more focused under stress</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q37" value="kapha" class="radio-input"> Under stress tends towards avoidance behaviors which creates apathy</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">38. Speech:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q38" value="vata" class="radio-input"> Speech rapid and unclear</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q38" value="pitta" class="radio-input"> Speech, sharp and penetrating</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q38" value="kapha" class="radio-input"> Speech slow, monotonous</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">39. Best Quality:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q39" value="vata" class="radio-input"> Best quality is flexibility, creativity</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q39" value="pitta" class="radio-input"> Best Quality is directness and leadership qualities</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q39" value="kapha" class="radio-input"> Best quality is steadiness, loyalty, understanding, acceptance and compassion</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">40. Worst Quality:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q40" value="vata" class="radio-input"> Worst quality – can feels like a victim and have self destructive behaviors, sneaky</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q40" value="pitta" class="radio-input"> Worst quality – blaming others not taking responsibility for self, domineering</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q40" value="kapha" class="radio-input"> Worst quality – avoidance of difficult situations not being direct, apathy, laziness, hording</label>
+                    </div>
+                    
+                    <div class="question-category">
+                        <p class="label">41. Intellect:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q41" value="vata" class="radio-input"> Intellect, quick but faulty response</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q41" value="pitta" class="radio-input"> Intellect accurate response</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q41" value="kapha" class="radio-input"> Intellect slow, but exact response</label>
+                    </div>
+
+                    <div class="question-category">
+                        <p class="label">42. Dreams:</p>
+                        <label class="radio-label"><input type="radio" name="ayur_q42" value="vata" class="radio-input"> Dreams about flying, has restless dreams prone to nightmares</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q42" value="pitta" class="radio-input"> Action-packed dreams with conflicts and passion</label>
+                        <label class="radio-label"><input type="radio" name="ayur_q42" value="kapha" class="radio-input"> Romantic, short dreams, often with water</label>
+                    </div>
+                    <button id="calculateDoshaButton" type="button" class="btn mt-6" onclick="calculateDosha()">Calculate Dosha Result</button>
+                </form>
+                <div id="doshaResults" class="mt-6">
+                </div>
+            </section>
+
+            <section id="ayurvedaGuidance" class="section">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Personalized Ayurvedic Guidance</h2>
+                <div id="guidanceContent" class="space-y-4">
+                     <p class="text-gray-600">Please complete the Dosha Quiz first to view personalized guidance.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center text-xs text-gray-500 mt-8 py-4">
+            <p>This information is for educational and personal insight purposes only and should not replace professional advice.</p>
+            <p>&copy; 2025 Dorine Insights App</p>
+        </footer>
+    </div> 
+    <script>
+        // --- Constants ---
+        const DEFAULT_PIN = "369";
+        const MASTER_PASSWORD = "Ayurveda";
+
+        // --- Global State & Initial Load ---
+        let currentSection = 'profileInput';
+        let userProfile = {
+            fullName: '',
+            dob: '',
+            numerology: null,
+            elemental: null,
+            dosha: null,
+            doshaScores: { vata: 0, pitta: 0, kapha: 0 } 
+        };
+        
+        let isProfileSavedThisSession = false; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkInitialPin();
+        });
+
+        function checkInitialPin() {
+            const appContent = document.getElementById('appContent');
+            const pinModal = document.getElementById('pinModal');
+            
+            loadProfile(); 
+
+            if (localStorage.getItem('pinVerifiedSession') === 'true') {
+                appContent.classList.remove('opacity-25', 'pointer-events-none');
+                pinModal.classList.add('modal-hidden');
+                isProfileSavedThisSession = localStorage.getItem('profileSavedForSession') === 'true'; 
+                
+                if (userProfile.fullName && userProfile.dob) populateNumerology();
+                if (userProfile.dosha && userProfile.doshaScores) {
+                    displayDoshaResults(userProfile.dosha, userProfile.doshaScores);
+                    populateAyurvedicGuidance();
+                }
+                showSection(localStorage.getItem('lastActiveSectionInsights') || 'profileInput');
+            } else {
+                pinModal.classList.remove('modal-hidden');
+                appContent.classList.add('opacity-25', 'pointer-events-none');
+            }
+            updateUIStates(); 
+        }
+
+        function verifyPin() {
+            const pinInput = document.getElementById('pinInput').value;
+            const pinError = document.getElementById('pinError');
+            
+            if (pinInput === DEFAULT_PIN) {
+                localStorage.setItem('pinVerifiedSession', 'true');
+                localStorage.removeItem('appUsedThisSession'); 
+                localStorage.removeItem('profileSavedForSession'); 
+                isProfileSavedThisSession = false; 
+                
+                document.getElementById('pinModal').classList.add('modal-hidden');
+                document.getElementById('appContent').classList.remove('opacity-25', 'pointer-events-none');
+                pinError.textContent = '';
+                
+                loadProfile(); 
+                if (userProfile.fullName && userProfile.dob) populateNumerology();
+                if (userProfile.dosha && userProfile.doshaScores) {
+                    displayDoshaResults(userProfile.dosha, userProfile.doshaScores);
+                    populateAyurvedicGuidance();
+                }
+                updateUIStates(); 
+                showSection('profileInput');
+            } else {
+                pinError.textContent = 'Invalid PIN. Please try again.';
+            }
+            document.getElementById('pinInput').value = '';
+        }
+        
+        function markAppAsUsed() { 
+            localStorage.setItem('appUsedThisSession', 'true');
+            updateUIStates(); 
+        }
+
+        function updateUIStates() {
+            const pinVerified = localStorage.getItem('pinVerifiedSession') === 'true';
+            const profileSaved = localStorage.getItem('profileSavedForSession') === 'true';
+            const appUsed = localStorage.getItem('appUsedThisSession') === 'true';
+            const sessionStatusEl = document.getElementById('sessionStatus');
+
+            const numerologyTab = document.querySelector('.tab[onclick*="numerology"]');
+            const ayurvedaQuizTab = document.querySelector('.tab[onclick*="ayurvedaQuiz"]');
+            const ayurvedaGuidanceTab = document.querySelector('.tab[onclick*="ayurvedaGuidance"]');
+
+            const setTabEnabled = (tab, enabled) => {
+                if (enabled) {
+                    tab.classList.remove('opacity-50', 'pointer-events-none', 'tab-disabled');
+                } else {
+                    tab.classList.add('opacity-50', 'pointer-events-none', 'tab-disabled');
+                }
+            };
+
+            setTabEnabled(numerologyTab, profileSaved || appUsed);
+            setTabEnabled(ayurvedaQuizTab, profileSaved || appUsed);
+            setTabEnabled(ayurvedaGuidanceTab, appUsed);
+
+
+            document.getElementById('fullName').disabled = profileSaved || appUsed;
+            document.getElementById('dob').disabled = profileSaved || appUsed;
+            document.getElementById('saveProfileButton').disabled = profileSaved || appUsed;
+
+            document.getElementById('calculateDoshaButton').disabled = !profileSaved || appUsed;
+            const quizForm = document.getElementById('doshaQuizForm');
+            const radioInputs = quizForm.querySelectorAll('input[type="radio"]');
+            radioInputs.forEach(input => input.disabled = !profileSaved || appUsed);
+
+            if (!pinVerified) {
+                 sessionStatusEl.textContent = "Awaiting PIN.";
+            } else if (appUsed) {
+                sessionStatusEl.textContent = "Session used. Reset for new calculations.";
+            } else if (profileSaved) {
+                sessionStatusEl.textContent = "Profile saved. Proceed to Ayurveda Quiz.";
+            } else {
+                sessionStatusEl.textContent = "PIN Verified. Please enter profile information.";
+            }
+        }
+
+        function promptForMasterPassword() {
+            document.getElementById('masterPasswordModal').classList.remove('modal-hidden');
+        }
+
+        function closeMasterPasswordModal() {
+            document.getElementById('masterPasswordModal').classList.add('modal-hidden');
+            document.getElementById('masterPasswordInput').value = '';
+            document.getElementById('masterPasswordError').textContent = '';
+        }
+
+        function verifyMasterPasswordAndReset() {
+            const masterPasswordInput = document.getElementById('masterPasswordInput').value;
+            const masterPasswordError = document.getElementById('masterPasswordError');
+
+            if (masterPasswordInput === MASTER_PASSWORD) {
+                localStorage.removeItem('userProfileInsights');
+                localStorage.removeItem('pinVerifiedSession');
+                localStorage.removeItem('appUsedThisSession');
+                localStorage.removeItem('profileSavedForSession');
+                localStorage.removeItem('lastActiveSectionInsights');
+                isProfileSavedThisSession = false; // Reset global flag
+                masterPasswordError.textContent = '';
+                closeMasterPasswordModal();
+                location.reload(); 
+            } else {
+                masterPasswordError.textContent = 'Incorrect Master Password.';
+            }
+            document.getElementById('masterPasswordInput').value = '';
+        }
+
+        function showSection(sectionId) {
+            const targetTab = Array.from(document.querySelectorAll('.tab')).find(tab => tab.getAttribute('onclick').includes(sectionId));
+            if (targetTab && targetTab.classList.contains('tab-disabled')) {
+                if (! (localStorage.getItem('profileSavedForSession') === 'true')) {
+                    alert("Please complete the Profile Input section first.");
+                } else if (sectionId === 'ayurvedaGuidance' && !(localStorage.getItem('appUsedThisSession') === 'true')) {
+                     alert("Please complete the Ayurveda Quiz first to view guidance.");
+                }
+                return; 
+            }
+
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            if(targetTab) targetTab.classList.add('active'); 
+
+            currentSection = sectionId;
+            localStorage.setItem('lastActiveSectionInsights', sectionId);
+        }
+
+        function saveProfileAndCalculate() {
+            const fullNameInput = document.getElementById('fullName').value.trim();
+            const dobInput = document.getElementById('dob').value;
+            const profileMessage = document.getElementById('profileMessage');
+
+            if (!fullNameInput || !dobInput) {
+                profileMessage.textContent = 'Please enter your full name and date of birth.';
+                profileMessage.className = 'mt-4 text-sm text-red-600';
+                return;
+            }
+
+            userProfile.fullName = fullNameInput;
+            userProfile.dob = dobInput;
+            
+            userProfile.numerology = calculateAllNumerology(userProfile.fullName, userProfile.dob);
+            userProfile.elemental = calculateElementalAssociation(userProfile.fullName);
+            
+            localStorage.setItem('userProfileInsights', JSON.stringify(userProfile));
+            localStorage.setItem('profileSavedForSession', 'true'); 
+            isProfileSavedThisSession = true;
+
+            profileMessage.textContent = 'Profile saved! You can view your Numerology & Element, or proceed to the Ayurveda Quiz.';
+            profileMessage.className = 'mt-4 text-sm text-green-600';
+            
+            populateNumerology();
+            updateUIStates(); 
+        }
+
+        function loadProfile() {
+            const savedProfile = localStorage.getItem('userProfileInsights');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
+                if (!userProfile.doshaScores) { 
+                    userProfile.doshaScores = { vata: 0, pitta: 0, kapha: 0 };
+                }
+                document.getElementById('fullName').value = userProfile.fullName || '';
+                document.getElementById('dob').value = userProfile.dob || '';
+                
+                if (localStorage.getItem('pinVerifiedSession') === 'true') { 
+                    isProfileSavedThisSession = localStorage.getItem('profileSavedForSession') === 'true';
+                } else {
+                    isProfileSavedThisSession = false; 
+                }
+            }
+        }
+
+        const pythagoreanMap = {
+            'a': 1, 'j': 1, 's': 1, 'A': 1, 'J': 1, 'S': 1,
+            'b': 2, 'k': 2, 't': 2, 'B': 2, 'K': 2, 'T': 2,
+            'c': 3, 'l': 3, 'u': 3, 'C': 3, 'L': 3, 'U': 3,
+            'd': 4, 'm': 4, 'v': 4, 'D': 4, 'M': 4, 'V': 4,
+            'e': 5, 'n': 5, 'w': 5, 'E': 5, 'N': 5, 'W': 5,
+            'f': 6, 'o': 6, 'x': 6, 'F': 6, 'O': 6, 'X': 6,
+            'g': 7, 'p': 7, 'y': 7, 'G': 7, 'P': 7, 'Y': 7,
+            'h': 8, 'q': 8, 'z': 8, 'H': 8, 'Q': 8, 'Z': 8,
+            'i': 9, 'r': 9, 'I': 9, 'R': 9
+        };
+        const vowels = "aeiouAEIOU";
+
+        function reduceNumber(num) {
+            while (num > 9) {
+                if (num === 11 || num === 22 || num === 33) break; 
+                num = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            }
+            return num;
+        }
+        
+        function calculateLifePath(dob) {
+            if (!dob) return null;
+            const [year, month, day] = dob.split('-').map(Number);
+            let sum = reduceNumber(day) + reduceNumber(month) + reduceNumber(year);
+            return reduceNumber(sum);
+        }
+
+        function calculateExpression(fullName) {
+            if (!fullName) return null;
+            let sum = 0;
+            for (let char of fullName) {
+                if (pythagoreanMap[char]) {
+                    sum += pythagoreanMap[char];
+                }
+            }
+            return reduceNumber(sum);
+        }
+
+        function calculateSoulUrge(fullName) {
+            if (!fullName) return null;
+            let sum = 0;
+            const nameLower = fullName.toLowerCase();
+            for (let i = 0; i < nameLower.length; i++) {
+                const char = nameLower[i];
+                let isYVowel = false;
+                if (char === 'y') {
+                    const prevChar = i > 0 ? nameLower[i-1] : null;
+                    const nextChar = i < nameLower.length - 1 ? nameLower[i+1] : null;
+                    const isPrevVowel = prevChar && vowels.includes(prevChar);
+                    const isNextVowel = nextChar && vowels.includes(nextChar);
+                    if (!isPrevVowel && !isNextVowel) { 
+                        isYVowel = true;
+                    }
+                }
+                if (vowels.includes(char) || isYVowel) {
+                    if (pythagoreanMap[char]) {
+                        sum += pythagoreanMap[char];
+                    }
+                }
+            }
+            return reduceNumber(sum);
+        }
+
+        function calculatePersonality(fullName) {
+            if (!fullName) return null;
+            let sum = 0;
+            const nameLower = fullName.toLowerCase();
+            for (let i = 0; i < nameLower.length; i++) {
+                const char = nameLower[i];
+                let isYVowel = false;
+                 if (char === 'y') {
+                    const prevChar = i > 0 ? nameLower[i-1] : null;
+                    const nextChar = i < nameLower.length - 1 ? nameLower[i+1] : null;
+                    const isPrevVowel = prevChar && vowels.includes(prevChar);
+                    const isNextVowel = nextChar && vowels.includes(nextChar);
+                     if (!isPrevVowel && !isNextVowel) {
+                        isYVowel = true;
+                    }
+                }
+                if (!vowels.includes(char) && !isYVowel && pythagoreanMap[char]) { 
+                     if (pythagoreanMap[char]) {
+                        sum += pythagoreanMap[char];
+                    }
+                }
+            }
+            return reduceNumber(sum);
+        }
+
+
+        function calculateBirthDay(dob) {
+            if (!dob) return null;
+            const day = parseInt(dob.split('-')[2]);
+            return { original: day, reduced: reduceNumber(day) };
+        }
+
+        function calculateAllNumerology(fullName, dob) {
+            return {
+                lifePath: calculateLifePath(dob),
+                expression: calculateExpression(fullName),
+                soulUrge: calculateSoulUrge(fullName),
+                personality: calculatePersonality(fullName),
+                birthDay: calculateBirthDay(dob)
+            };
+        }
+
+        const elementMap = {
+            1: 'Fire', 9: 'Fire', 
+            3: 'Air', 5: 'Air', 
+            2: 'Water', 6: 'Water', 7: 'Water', 
+            4: 'Earth', 8: 'Earth'
+        };
+
+        function calculateElementalAssociation(fullName) {
+            if (!fullName) return null;
+            const elementCounts = { 'Fire': 0, 'Air': 0, 'Water': 0, 'Earth': 0 };
+            for (let char of fullName) {
+                if (pythagoreanMap[char]) {
+                    const numValue = pythagoreanMap[char];
+                    const rootDigit = reduceNumber(numValue); 
+                    if (elementMap[rootDigit]) {
+                        elementCounts[elementMap[rootDigit]]++;
+                    }
+                }
+            }
+            let dominantElement = 'Undetermined';
+            let maxCount = -1; 
+            for (const element in elementCounts) {
+                if (elementCounts[element] > maxCount) {
+                    maxCount = elementCounts[element];
+                    dominantElement = element;
+                }
+            }
+            return dominantElement;
+        }
+
+        function populateNumerology() {
+            const resultsDiv = document.getElementById('numerologyResults');
+            if (!userProfile.numerology || !userProfile.elemental) {
+                resultsDiv.innerHTML = '<p class="text-gray-600">Numerology and elemental information will be displayed after entering your name and date of birth in the "Profile Input" section.</p>';
+                return;
+            }
+            
+            const n = userProfile.numerology;
+            const el = userProfile.elemental;
+
+            resultsDiv.innerHTML = `
+                <div class="result-card">
+                    <h3>Your Dominant Element: ${el}</h3>
+                    <p>The element of ${el}, as your foundational energy, influences your natural tendencies, strengths, and potential challenges. Understanding this element helps in deeper self-awareness and how you interact with the world. (For a complete and personalized analysis, consultation with an expert is recommended.)</p>
+                </div>
+                <div class="result-card">
+                    <h3>Life Path Number: ${n.lifePath}</h3>
+                    <p>This number, derived from your date of birth, is the most important in your numerology chart. It indicates your main life path, inherent purpose, key lessons to learn, and the opportunities and challenges you will encounter. It helps you recognize your natural talents and step onto the path of your full potential.</p>
+                </div>
+                <div class="result-card">
+                    <h3>Expression (Destiny) Number: ${n.expression}</h3>
+                    <p>Calculated from your full birth name, this number reveals your talents, abilities, and overall potential in life. It signifies how you express yourself in the world and the path through which you can best utilize your capabilities to achieve your goals. It can also highlight your natural strengths and weaknesses.</p>
+                </div>
+                <div class="result-card">
+                    <h3>Soul Urge (Heart's Desire) Number: ${n.soulUrge}</h3>
+                    <p>Derived from the vowels in your name, this number represents your deepest desires, inner motivations, and what truly moves your heart. It signifies your "true self" and what matters to you on a soul level, even if not always shown externally. Understanding this number helps align with your genuine motivations.</p>
+                </div>
+                <div class="result-card">
+                    <h3>Personality Number: ${n.personality}</h3>
+                    <p>Calculated from the consonants in your name, this number describes the aspects of yourself that you project to the outer world and to those who don't know you well. It's your external "mask" or persona and can influence first impressions. It can also indicate traits you wish others to see in you.</p>
+                </div>
+                <div class="result-card">
+                    <h3>Birth Day Number: ${n.birthDay.original} (Root: ${n.birthDay.reduced})</h3>
+                    <p>Your birth day number highlights specific talents and characteristics given to you at birth. It can influence certain personality traits and innate abilities, acting as a gift or an auxiliary tool on your life path. The root of this number also adds another layer of meaning.</p>
+                </div>
+            `;
+        }
+
+        function calculateDosha() {
+            if (localStorage.getItem('appUsedThisSession') === 'true') {
+                alert("This session has been used. Please reset for new calculations.");
+                return;
+            }
+             if (!(localStorage.getItem('profileSavedForSession') === 'true')) {
+                alert("Please save your profile information first before calculating Dosha.");
+                showSection('profileInput');
+                return;
+            }
+
+            const form = document.getElementById('doshaQuizForm');
+            const scores = { vata: 0, pitta: 0, kapha: 0 };
+            
+            const questionNames = [];
+            for(let i=1; i<=35; i++) questionNames.push(`ayur_q${i}`);
+            questionNames.push('ayur_q36_appetite');
+            questionNames.push('ayur_q36_preference');
+            for(let i=37; i<=42; i++) questionNames.push(`ayur_q${i}`);
+            
+            let answeredAll = true;
+            // Clear previous unanswered highlights
+            document.querySelectorAll('.question-category.unanswered-question').forEach(el => el.classList.remove('unanswered-question'));
+
+            questionNames.forEach(qName => {
+                const radioGroup = form.elements[qName];
+                const questionCategoryDiv = radioGroup && radioGroup[0] ? radioGroup[0].closest('.question-category') : (radioGroup ? radioGroup.closest('.question-category') : null) ;
+
+
+                if (radioGroup && radioGroup.value) {
+                    scores[radioGroup.value]++;
+                    if (questionCategoryDiv) questionCategoryDiv.classList.remove('unanswered-question');
+                } else if (radioGroup) { 
+                    answeredAll = false;
+                    if (questionCategoryDiv) questionCategoryDiv.classList.add('unanswered-question');
+                } else {
+                    console.warn("Radio group not found during explicit check: ", qName);
+                    // If a question group is fundamentally missing from HTML, mark as not answered
+                    // This might require finding the conceptual div if radioGroup itself is undefined
+                    const conceptualDiv = document.querySelector(`input[name="${qName}"]`)?.closest('.question-category');
+                    if(conceptualDiv) conceptualDiv.classList.add('unanswered-question');
+                    answeredAll = false; 
+                }
+            });
+
+            const resultsDiv = document.getElementById('doshaResults');
+            if (!answeredAll) {
+                 resultsDiv.innerHTML = `<p class="text-red-500">Please answer all highlighted questions.</p>`;
+                 return;
+            }
+
+            userProfile.doshaScores = scores;
+            let dominantDoshaString = 'Undetermined';
+            
+            const sortedDoshas = Object.entries(scores).sort(([,a],[,b]) => b-a);
+
+            const primaryDosha = sortedDoshas[0][0];
+            const primaryScore = sortedDoshas[0][1];
+            const secondaryDosha = sortedDoshas[1][0];
+            const secondaryScore = sortedDoshas[1][1];
+            const tertiaryDosha = sortedDoshas[2][0];
+            const tertiaryScore = sortedDoshas[2][1];
+
+            if (primaryScore === 0 && secondaryScore === 0 && tertiaryScore === 0 && answeredAll) {
+                dominantDoshaString = "Please select options"; 
+            } else if (primaryScore > secondaryScore + 2 && primaryScore > tertiaryScore + 2) { 
+                dominantDoshaString = primaryDosha.toUpperCase();
+            } else if (Math.abs(primaryScore - secondaryScore) <= 2 && primaryScore > tertiaryScore + 2 && secondaryScore > tertiaryScore + 2 && primaryScore > 0 && secondaryScore > 0) { 
+                dominantDoshaString = `${primaryDosha.toUpperCase()}-${secondaryDosha.toUpperCase()}`;
+            } else if (primaryScore > 0 && secondaryScore > 0 && tertiaryScore > 0 && Math.abs(primaryScore - secondaryScore) <= 2 && Math.abs(secondaryScore - tertiaryScore) <= 2 && Math.abs(primaryScore - tertiaryScore) <=2 ) { 
+                 dominantDoshaString = "TRIDOSHIC (Balanced)";
+            } else if (primaryScore > 0) { 
+                 dominantDoshaString = primaryDosha.toUpperCase();
+                 if (secondaryScore > 0 && Math.abs(primaryScore - secondaryScore) <= 2 ) { 
+                    dominantDoshaString = `${primaryDosha.toUpperCase()}-${secondaryDosha.toUpperCase()}`;
+                 }
+            } else { 
+                dominantDoshaString = "Result undetermined, please select more options.";
+            }
+            
+            userProfile.dosha = dominantDoshaString;
+            localStorage.setItem('userProfileInsights', JSON.stringify(userProfile));
+
+            displayDoshaResults(dominantDoshaString, scores);
+            populateAyurvedicGuidance();
+            markAppAsUsed(); 
+        }
+        
+        function displayDoshaResults(dominantDoshaString, scores) {
+            const resultsDiv = document.getElementById('doshaResults');
+            resultsDiv.innerHTML = `
+                <div class="result-card">
+                    <h3>Your Dominant Dosha: ${dominantDoshaString}</h3>
+                    <p>Scores: Vata: ${scores.vata}, Pitta: ${scores.pitta}, Kapha: ${scores.kapha}</p>
+                    <p>Brief Explanation: ${getDoshaDescription(dominantDoshaString)} (Full explanations require specialized content)</p>
+                </div>
+            `;
+        }
+        
+        function getDoshaDescription(dosha) {
+            const descriptions = {
+                'VATA': 'Vata (Air & Ether): Typically light, creative, energetic, and prone to dryness and change.',
+                'PITTA': 'Pitta (Fire & Water): Usually determined, intelligent, with moderate body heat, and prone to inflammation or irritability.',
+                'KAPHA': 'Kapha (Earth & Water): Generally calm, stable, strong-bodied, and prone to heaviness or congestion.',
+                'VATA-PITTA': 'Vata-Pitta Combination: Vata\'s creativity and energy meet Pitta\'s focus and drive. May need to manage stress and heat.',
+                'PITTA-VATA': 'Pitta-Vata Combination: Pitta\'s drive and intellect meet Vata\'s speed and variability. Balancing and preventing burnout is key.',
+                'VATA-KAPHA': 'Vata-Kapha Combination: Vata\'s lightness and creativity meet Kapha\'s stability and calmness. Maintaining motivation and avoiding stagnation is important.',
+                'KAPHA-VATA': 'Kapha-Vata Combination: Kapha\'s stability and strength meet Vata\'s flexibility. Staying active and avoiding heaviness is key.',
+                'PITTA-KAPHA': 'Pitta-Kapha Combination: Pitta\'s focus and drive meet Kapha\'s stability and endurance. Managing heat and avoiding stagnation is important.',
+                'KAPHA-PITTA': 'Kapha-Pitta Combination: Kapha\'s calmness and strength meet Pitta\'s intellect and drive. Maintaining motivation and managing heat is key.',
+                'TRIDOSHIC (Balanced)': 'You have a relative balance of all three doshas. This can indicate good health and adaptability, but it\'s still important to pay attention to seasonal and lifestyle changes.',
+                'Undetermined': 'Please complete the quiz.',
+                'Please select options': 'To see your result, please select options in the quiz.',
+                'Result undetermined, please select more options.': 'Result undetermined, please select more options or make clearer choices.'
+            };
+            return descriptions[dosha] || 'Description for this Dosha combination is being prepared.';
+        }
+
+        function populateAyurvedicGuidance() {
+            const guidanceDiv = document.getElementById('guidanceContent');
+            const generalIntro = `
+                <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md text-sm">
+                    <h4 class="font-semibold text-blue-700">Understanding Ayurveda: The Science of Life</h4>
+                    <p class="mt-1">Ayurveda, a 5,000-year-old Indian science, is the "science of life" ("Ayur" = life, "Veda" = science/knowledge). It focuses on holistic well-being through diet, lifestyle, and seasonal routines, with a primary goal of prevention, not just cure. Ayurveda addresses issues by understanding that biological energies (Doshas - Vata, Pitta, Kapha) are dynamic forces within us, constantly shifting based on the five great elements (Pancha Mahabhutas): Space (expansion), Air (movement), Fire (transformation), Water (fluidity), and Earth (solidity).</p>
+                </div>`;
+
+            if (!userProfile.dosha || userProfile.dosha === 'Undetermined' || userProfile.dosha === 'Please select options' || userProfile.dosha.startsWith('Result undetermined')) {
+                guidanceDiv.innerHTML = `<p class="text-gray-600">Ayurvedic guidance will be displayed after completing the Dosha Quiz.</p>${generalIntro}`;
+                return;
+            }
+
+            const dosha = userProfile.dosha;
+            let content = `${generalIntro}<h3>Guidance for Your Constitution: ${dosha}</h3>`;
+            
+            const doshaInfo = {
+                VATA: {
+                    characteristics: "Light, dry, cool, irregular, mobile. Associated with Air and Ether elements. Vata's irregularity is highlighted by fluctuating energy levels—sometimes high, sometimes low. Imbalance can manifest as insomnia, anxiety, constipation, and dry skin. Excessive movement or overthinking can result in sadness and depression.",
+                    diet: [
+                        "Favor warm, moist, grounding, and nourishing foods (soups, stews, cooked grains, root vegetables). Consuming butter is emphasized for bone health and tissue regeneration.",
+                        "Include healthy fats like ghee, sesame oil, and avocado (brought to room temperature, possibly with salt or heat for digestibility).",
+                        "Sweet, sour, and salty tastes balance Vata.",
+                        "Avoid raw, cold, very light, and dry foods (e.g., excessive salads, crackers if not balanced, dried fruits in excess). Avoid cold food and drinks. Lightweight foods like crackers are preferable to heavier options if Vata is very high and Agni (digestive fire) is weak.",
+                        "Kidney beans are naturally drying; prepare them well (e.g., soaking, cooking with spices like ginger and asafoetida, cooling before cooking to remove air/foam) to prevent bloating. Cabbage can be gas-producing.",
+                        "Spiced warm apple treats can be soothing. Use warming spices like cinnamon, nutmeg, and ginger moderately.",
+                        "Eat when hungry; Vata appetite can be irregular. Avoid skipping meals if it leads to feeling depleted. Regular meals are crucial; avoid fasting.",
+                        "Prefer crunchy foods like popcorn and rice crackers, but balance with moist items. Smoothies and frozen foods should generally be avoided or taken with warming spices.",
+                        "Ginger and celery juice (not cold) can be a remedy for some imbalances. Avoid coffee, or if consumed, avoid dairy with it; sugar may temporarily mask negative effects. Black tea's bitterness might be less appealing."
+                    ],
+                    lifestyle: [
+                        "Establish a regular daily and weekend routine (sleep, wake, meals) to provide stability and combat irregularity. Balancing internal states is key.",
+                        "Engage in calming and grounding activities: gentle yoga, Tai Chi, meditation. Meditation aims to improve bodily functions like circulation and movement. Grounding practices are important for managing Vata's instability.",
+                        "Keep yourself warm, especially hands and feet. Avoid cold, dry, windy environments.",
+                        "Moisturize dry skin regularly, especially on elbows, knees, and joints. Oil application (Abhyanga) with warm sesame or almond oil is highly beneficial. Different oils have varying properties; some are lighter, others heavier.",
+                        "Manage Vata's tendency towards anxiety, worry, and overthinking with grounding practices. Ensure sufficient rest to avoid low morning energy.",
+                        "Avoid excessive travel, overstimulation, and multitasking that leads to burnout or feeling scattered. Lack of movement and breathing in poor air quality can aggravate Vata.",
+                        "Silent retreats or periods of minimal movement can be healing.",
+                        "Optimal time for 'butter application' (likely referring to oil massage or internal consumption for dryness) is noted as 2:00 to 6:00 (AM/PM not specified, but often refers to Vata times of day)."
+                    ],
+                    herbs: "Warming herbs like ginger, cinnamon, cardamom, and ashwagandha."
+                },
+                PITTA: {
+                    characteristics: "Hot, sharp, intense, light, liquid. Associated with Fire and Water elements. Fire relates to transformation and digestion. Intellect is linked to fire.",
+                    diet: [
+                        "Emphasize cooling, hydrating, and slightly dry foods. Favor sweet, bitter, and astringent tastes.",
+                        "Include fresh vegetables, sweet fruits (like pomegranate, black grapes, coconut), and grains like rice and barley.",
+                        "Avoid or reduce spicy, sour, salty, oily, and fried foods. Moderate intake of acidic foods like tomatoes. Avoid pungent sauces.",
+                        "Coconut is a good cooling agent. Cucumber is also beneficial.",
+                        "Avoid alcohol and coffee due to their acidity and potential negative impact on the liver; black tea in moderation might be better.",
+                        "Eat when hungry to prevent irritability, as Pitta has strong digestion (Agni). Do not skip meals. Understand 'Agni' (digestive fire) and its types (strong, irregular, slow).",
+                        "Consuming fish with a salad is suggested for balance. Avoid red meat and excessive nuts.",
+                        "Avoid orange citrus fruits and berries if too acidic. Vinegar and grapefruit have heating action."
+                    ],
+                    lifestyle: [
+                        "Incorporate calming practices such as swimming, walking in nature (especially near water), and non-competitive yoga. Mindful eating for better sleep.",
+                        "Avoid excessive heat, sun exposure, and stressful, confrontational situations. The ideal environment is calm, cool, and shady.",
+                        "Aim for a balanced daily routine with moderate activity. Avoid overworking to the point of burnout.",
+                        "Ensure you stay cool. Eating outdoors can improve digestion.",
+                        "Manage Pitta's tendency towards intensity, criticism, anger, and irritability with cooling and calming activities.",
+                        "For sauna, avoid excessive heat to the head and heart."
+                    ],
+                    herbs: "Cooling herbs like mint, coriander, cilantro, fennel, shatavari, and aloe vera."
+                },
+                KAPHA: {
+                    characteristics: "Heavy, slow, steady, solid, cold, oily. Associated with Earth and Water elements. Bones are linked to the earth element, representing solidity.",
+                    diet: [
+                        "Focus on light, dry, and warming foods. Emphasize pungent, bitter, and astringent tastes.",
+                        "Include plenty of vegetables (especially bitter greens), legumes, and warming spices.",
+                        "Favor dry crackers, rice (in moderation), and ginger for digestion. Lightweight foods like crackers are preferable to heavier options.",
+                        "Avoid or reduce heavy, oily, cold, sweet, and excessively dairy foods (e.g., ice cream, cheese, fried foods, pastries, staunchy foods).",
+                        "Use stimulating and warming spices like ginger, turmeric, black pepper, cinnamon, and nutmeg (use cinnamon/nutmeg sparingly).",
+                        "Dried fruits are generally better than very sweet, watery fresh fruits for Kapha.",
+                        "Avoid perishable food and drinks that spoil easily. Avoid foods with strong or lingering tastes if they cause digestive issues."
+                    ],
+                    lifestyle: [
+                        "Engage in regular, vigorous, and stimulating exercise to counteract lethargy and sluggishness. Avoid a sedentary lifestyle.",
+                        "Maintain a dynamic and active routine. Wake up early and avoid oversleeping or daytime naps.",
+                        "Expose yourself to new experiences and seek stimulation. Avoid getting stuck in ruts.",
+                        "Keep warm and dry, avoiding cold, damp environments.",
+                        "If feeling congested or heavy, a gentle detoxification process might be beneficial to remove toxicity and blockages.",
+                        "Challenge tendencies towards possessiveness, apathy, laziness, or hoarding with activity and non-attachment practices."
+                    ],
+                    herbs: "Stimulating and warming herbs like ginger, turmeric, black pepper, cinnamon, trikatu, and guggulu."
+                }
+            };
+
+            let doshaSpecificContent = "";
+
+            if (dosha.includes('VATA')) {
+                doshaSpecificContent += `<div class="result-card"><h4>Vata Dosha (Air & Ether)</h4><p><strong>Characteristics:</strong> ${doshaInfo.VATA.characteristics}</p><h4>Dietary Recommendations:</h4><ul>${doshaInfo.VATA.diet.map(item => `<li>${item}</li>`).join('')}</ul><h4>Lifestyle Recommendations:</h4><ul>${doshaInfo.VATA.lifestyle.map(item => `<li>${item}</li>`).join('')}</ul><h4>Herbal Support:</h4><p>${doshaInfo.VATA.herbs}</p></div>`;
+            }
+            if (dosha.includes('PITTA')) {
+                doshaSpecificContent += `<div class="result-card"><h4>Pitta Dosha (Fire & Water)</h4><p><strong>Characteristics:</strong> ${doshaInfo.PITTA.characteristics}</p><h4>Dietary Recommendations:</h4><ul>${doshaInfo.PITTA.diet.map(item => `<li>${item}</li>`).join('')}</ul><h4>Lifestyle Recommendations:</h4><ul>${doshaInfo.PITTA.lifestyle.map(item => `<li>${item}</li>`).join('')}</ul><h4>Herbal Support:</h4><p>${doshaInfo.PITTA.herbs}</p></div>`;
+            }
+            if (dosha.includes('KAPHA')) {
+                doshaSpecificContent += `<div class="result-card"><h4>Kapha Dosha (Earth & Water)</h4><p><strong>Characteristics:</strong> ${doshaInfo.KAPHA.characteristics}</p><h4>Dietary Recommendations:</h4><ul>${doshaInfo.KAPHA.diet.map(item => `<li>${item}</li>`).join('')}</ul><h4>Lifestyle Recommendations:</h4><ul>${doshaInfo.KAPHA.lifestyle.map(item => `<li>${item}</li>`).join('')}</ul><h4>Herbal Support:</h4><p>${doshaInfo.KAPHA.herbs}</p></div>`;
+            }
+            
+            if (dosha === 'TRIDOSHIC (Balanced)') {
+                let tridoshicNote = `<div class="result-card"><h4>For Tridoshic Balance:</h4><p>You have a relative balance of all three doshas. Focus on maintaining this balance by adapting your diet and lifestyle according to the seasons and your current feelings. Listen to your body and choose practices from each dosha's recommendations as needed to counteract any slight imbalances that may arise. Prioritize a varied diet of fresh, whole foods and a balanced routine.</p></div>`;
+                // Ensure each dosha's info is shown once for Tridoshic
+                let tempContent = "";
+                if (doshaInfo.VATA) tempContent += `<div class="result-card"><h4>Vata Dosha (Air & Ether)</h4><p><strong>Characteristics:</strong> ${doshaInfo.VATA.characteristics}</p><h4>Dietary Recommendations:</h4><ul>${doshaInfo.VATA.diet.map(item => `<li>${item}</li>`).join('')}</ul><h4>Lifestyle Recommendations:</h4><ul>${doshaInfo.VATA.lifestyle.map(item => `<li>${item}</li>`).join('')}</ul><h4>Herbal Support:</h4><p>${doshaInfo.VATA.herbs}</p></div>`;
+                if (doshaInfo.PITTA) tempContent += `<div class="result-card"><h4>Pitta Dosha (Fire & Water)</h4><p><strong>Characteristics:</strong> ${doshaInfo.PITTA.characteristics}</p><h4>Dietary Recommendations:</h4><ul>${doshaInfo.PITTA.diet.map(item => `<li>${item}</li>`).join('')}</ul><h4>Lifestyle Recommendations:</h4><ul>${doshaInfo.PITTA.lifestyle.map(item => `<li>${item}</li>`).join('')}</ul><h4>Herbal Support:</h4><p>${doshaInfo.PITTA.herbs}</p></div>`;
+                if (doshaInfo.KAPHA) tempContent += `<div class="result-card"><h4>Kapha Dosha (Earth & Water)</h4><p><strong>Characteristics:</strong> ${doshaInfo.KAPHA.characteristics}</p><h4>Dietary Recommendations:</h4><ul>${doshaInfo.KAPHA.diet.map(item => `<li>${item}</li>`).join('')}</ul><h4>Lifestyle Recommendations:</h4><ul>${doshaInfo.KAPHA.lifestyle.map(item => `<li>${item}</li>`).join('')}</ul><h4>Herbal Support:</h4><p>${doshaInfo.KAPHA.herbs}</p></div>`;
+                doshaSpecificContent = tempContent + tridoshicNote;
+            }
+            
+            const generalTips = `
+                <div class="result-card">
+                    <h4>General Ayurvedic Wisdom & Tips for Balance:</h4>
+                    <ul>
+                        <li>Each person has a unique constitution (Prakriti). It’s important to maintain balance through diet, lifestyle, and herbal support tailored to individual needs. Doshas are dynamic and constantly shift; awareness helps in managing them.</li>
+                        <li>The primary goal of Ayurveda is prevention. Listen to your body's hunger signals and eat when truly hungry. Avoid overeating or forcing consumption. The digestive system's function involves assimilation, transformation, and immunity. Food transforms and provides nutrients to tissues, boosting immunity.</li>
+                        <li>Engage all five senses in food preparation and consumption: food should be appealing to sight, smell, taste, touch (texture), and even sound (e.g., sizzling). Prepare food with love.</li>
+                        <li>Eating outdoors can improve digestion. Maintain a positive emotional state during meals.</li>
+                        <li>Avoid certain activities immediately after eating to prevent digestive issues, such as showering, swimming, intense exercise, or consuming cold items like ice cream or excessive cold water.</li>
+                        <li>Proper hydration is crucial, but avoid excessive liquid intake, especially when ill or during meals (small sips of warm water are okay).</li>
+                        <li>Fresh food should ideally be consumed within a few hours of cooking or at least within 24 hours if stored properly. Leftovers beyond that may be harder to digest. Large meat portions should be frozen and defrosted appropriately.</li>
+                        <li>Establishing a daily and weekend routine for eating, sleeping, and activity is crucial for maintaining healthy habits and balancing doshas.</li>
+                        <li>Understand your digestive fire (Agni). It can be strong, irregular, or slow, impacting how you process food.</li>
+                        <li>Remember, this guidance is general. For personalized advice and to address specific health concerns, consider consulting with an Ayurvedic practitioner.</li>
+                    </ul>
+                </div>`;
+            
+            guidanceDiv.innerHTML = content + doshaSpecificContent + generalTips + `<p class="text-xs text-gray-500 mt-2">Note: This information is for educational purposes and does not replace consultation with an Ayurvedic specialist.</p>`;
+        }
+
+        // Service Worker Registration (for PWA)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+
+    </script>
+</body>
+</html>
